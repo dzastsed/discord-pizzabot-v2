@@ -1,2 +1,2 @@
 # discord-pizzabot-v2
-yes
+unfucked pizzabot
