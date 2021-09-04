@@ -22,7 +22,7 @@ async def initSql():
     pool = await aiomysql.create_pool(
             host='127.0.0.1',
             port=3306,
-            user='root',
+            user='user',
             password='1223344556',
             db='pizzabot',
             charset='utf8mb4',
@@ -98,7 +98,7 @@ async def logMessage(channel, text):
 @bot.event
 async def on_message(msg):
     global initDone
-    if msg.author.bot or not initDone:
+    if msg.author.bot and not msg.author.id == 849689355773018192 or not initDone:
         return
     #return
 
@@ -107,48 +107,49 @@ async def on_message(msg):
     await logMessage(msg.channel.id, message)
 
     if bot_has_permissions(send_messages=True):
-        msgArray = message.split()
+        async with msg.channel.typing():
+            msgArray = message.split()
 
-        try:
-            startWord = await mysqlQuery('''SELECT content FROM messages WHERE previousWord = {0}
-                            UNION ALL SELECT content FROM messages WHERE previousWord = {0} AND secondLastWord = {1}
-                            UNION ALL SELECT content FROM messages WHERE previousWord = {0} AND secondLastWord = {1}
-                            ORDER BY rand() LIMIT 1'''
-                            .format(
-                                escape(msgArray[-1].lower()),
-                                escape(msgArray[-2].lower() if len(msgArray) > 1 else ' ') #word cant be a space because we split by space
+            try:
+                startWord = await mysqlQuery('''SELECT content FROM messages WHERE previousWord = {0}
+                                UNION ALL SELECT content FROM messages WHERE previousWord = {0} AND secondLastWord = {1}
+                                UNION ALL SELECT content FROM messages WHERE previousWord = {0} AND secondLastWord = {1}
+                                ORDER BY rand() LIMIT 1'''
+                                .format(
+                                    escape(msgArray[-1].lower()),
+                                    escape(msgArray[-2].lower() if len(msgArray) > 1 else ' ') #word cant be a space because we split by space
+                                )
                             )
-                        )
-            if len(startWord) < 1:
-                print('start word not found')
-                raise Exception('couldnt find a word')
-            print('Start word found')
-            content, = startWord[0]
-            startWord = content.split(' ')[0]
-            msgLen = random.randint(1, 10)
-            message = [startWord]
-            word = startWord
-            for i in range(msgLen):
-                word = await mysqlQuery('''SELECT word FROM words
-                                WHERE previousWord={}
-                                ORDER BY rand()
-                                LIMIT 1'''
-                            .format(
-                                escape(word.lower())
+                if len(startWord) < 1:
+                    print('start word not found')
+                    raise Exception('couldnt find a word')
+                print('Start word found')
+                content, = startWord[0]
+                startWord = content.split(' ')[0]
+                msgLen = random.randint(1, 10)
+                message = [startWord]
+                word = startWord
+                for i in range(msgLen):
+                    word = await mysqlQuery('''SELECT word FROM words
+                                    WHERE previousWord={}
+                                    ORDER BY rand()
+                                    LIMIT 1'''
+                                .format(
+                                    escape(word.lower())
+                                )
                             )
-                        )
-                if len(word) == 0:
-                    break
-                word, = word[0]
-                message.append(word)
-                print('next word appended')
-            message = ' '.join(message)
-            if message != '':
-                await msg.channel.send(message)
-                return
-        except:
-            pass
-        #await msg.channel.send('no u')
+                    if len(word) == 0:
+                        break
+                    word, = word[0]
+                    message.append(word)
+                    print('next word appended')
+                message = ' '.join(message)
+                if message != '':
+                    await msg.channel.send(message)
+                    return
+            except:
+                pass
+            #await msg.channel.send('no u')
 
 async def migrate():
     files = [f for f in os.listdir('.') if os.path.isfile(os.path.join('.', f)) and f.endswith('.txt')]
@@ -161,12 +162,17 @@ async def migrate():
                 except:
                     pass
 
-#@slash.slash(name="restart", guild_ids=guild_ids, description="restart pizzasad if it doesnt work")
-#async def restart(ctx):
-  #embed=discord.Embed(title=":white_check_mark:",desc="Successfully Restarted")
-  #await ctx.send("yo momma gay")
-  #os.system("clear")
-  #os.execv(sys.executable, ['python'] + sys.argv)
-  #await ctx.send("succesfully restarted")
+@slash.slash(name="restart", guild_ids=guild_ids, description="restart pizzasad if it doesnt work")
+async def restart(ctx):
+  embed=discord.Embed(title=":white_check_mark:",desc="Successfully Restarted")
+  await ctx.send("yo momma gay")
+  os.system("clear")
+  os.execv(sys.executable, ['python'] + sys.argv)
+  await ctx.send("succesfully restarted")
+
+@bot.event
+async def on_member_update(before, after):
+    if before.id == 499660709458870293:
+        print("{} has gone {}.".format(after.name,after.status))
 
 bot.run(TOKEN)
