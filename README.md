@@ -120,6 +120,10 @@ pip-review --local --interactive
 
 In terms of bot setup on Discord's side, make sure the bot has Privileged Gateway intents turned on, and has suitable permissions (such as read messages/view channels, send messages, embed links, attach files, read message history, use external emojis. The integer would be 379904 in that example).
 
+# Alternative version
+
+In some cases main version refuses to respond to the messages, then you can use the alternative script.
+
 # Credits
 Chayleaf - for initial code this bot is forked from.
 
