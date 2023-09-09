@@ -45,6 +45,9 @@ urpmi python3 mariadb screen
 ## Debian + derivatives / Ubuntu + derivatives
 sudo apt install python3 mariadb-server screen
 
+## Alpine linux + derivatives
+sudo apk add python3 mysql mysql-client py3-pip
+
 
 Other Linux distros and other operating systems that supply Python 3 and MariaDB server will work too (screen is an optional extra, just to allow the bot to run in the background), though its package installation instructions are not provided. Every following step should work though.
 
