@@ -50,13 +50,13 @@ Other Linux distros and other operating systems that supply Python 3 and MariaDB
 
 
 ## Installing python packages from pip
-sudo pip3 install discord
+pip3 install discord.py==1.7.3
 
-sudo pip3 install aiomysql
+pip3 install aiomysql
 
-sudo pip3 install python-dotenv
+pip3 install python-dotenv
 
-sudo pip3 install discord-py-slash-command
+pip3 install discord-py-slash-command==1.1.2
 
 ## Adding credentials 
 
